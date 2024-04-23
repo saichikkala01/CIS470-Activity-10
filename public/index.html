@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js" integrity="sha512-vc58qvvBdrDR4etbxMdlTt4GBQk1qjvyORR2nrsPsFPyrs+/u5c3+1Ct6upOgdZoIl7eq6k3a1UPDSNAQi/32A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <title>Triangle App</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            font-size: 18px;
+            height: 100vh;
+        }
+        .container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+        }
+        svg{
+            border: 1px solid black;
+        }
+        
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="row">
+        <div class="col text-center">
+        <h1>Triangle Checker</h1>
+        </div>
+    </row>
+    <div class="row">
+        <div class="col-md-6"><br><br><br>
+            <form id="triangleForm">
+                <label for="side1" class="form-check-label">Side 1:</label>
+                <input type="number" id="side1" name="side1" class="form-control" required>
+                <br>
+                <label for="side2" class="form-check-label">Side 2:</label>
+                <input type="number" id="side2" name="side2" class="form-control" required>
+                <br>
+                <label for="side3" class="form-check-label">Side 3:</label>
+                <input type="number" id="side3" name="side3" class="form-control" required>
+                <br>
+                <button type="submit" class="btn btn-primary">Check Triangle</button>
+            </form>
+        </div>
+        <div class="col-md-6">
+            <h2  class="text-center">Result</h2>
+            <div>Triangle type: <span class="result" id="result"></span></div>
+            
+            <div id="canvas"><svg width=400 height=400></svg></div>
+        </div>
+    </div>
+</div>
+    <script>
+
+        const apiEndpoint = '/default/CIS470-Activity-8';
+
+        document.getElementById('triangleForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const side1 = parseFloat(document.getElementById('side1').value);
+            const side2 = parseFloat(document.getElementById('side2').value);
+            const side3 = parseFloat(document.getElementById('side3').value);
+            drawTriangle("canvas",side1,side2,side3);
+
+            fetch(apiEndpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ side1, side2, side3 })
+            })
+            .then(response => response.json())
+            .then(data => {
+          
+                const resultDiv = document.getElementById('result');
+                console.log(data)
+                resultDiv.textContent =data.result
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+        
+    </script>
+
+
+    <script>
+        function drawTriangle(elementId, S1, S2, S3) {
+        
+            const maxSideLength = Math.max(S1, S2, S3);
+            
+        
+            //scale sides
+            const sideScaler = d3.scaleLinear().domain([0, maxSideLength]).range([20, 200]);
+            const side1 = sideScaler(S1);
+            const side2 = sideScaler(S2);
+            const side3 = sideScaler(S3);
+        
+            // Calculate coordinates of the vertices based on the given side lengths
+                const x1 = 100;
+                const y1 = 100;
+                const x2 = x1 + side1;
+                const y2 = y1;
+                const x3 = (Math.pow(side2, 2) - Math.pow(side3, 2) + Math.pow(side1, 2)) / (2 * side1) + x1;
+                const y3 = Math.sqrt(Math.pow(side2, 2) - Math.pow((x3 - x1), 2)) + y1;
+        
+                // Create an array of vertices
+                const vertices = [
+                    [x1, y1],
+                    [x2, y2],
+                    [x3, y3]
+                ];
+        
+                // Create SVG element
+                d3.select(`#${elementId}`).selectAll("*").remove();
+                const svg = d3.select(`#${elementId}`).append("svg").attr("height", 400).attr("width", 400);
+        
+                // Draw the triangle
+                svg.append("polygon")
+                    .attr("points", vertices.map(d => d.join(",")).join(" "))
+                    .attr("fill", "lightblue")
+                    .attr("stroke", "black")
+                    .attr("stroke-width", 1);
+            }
+
+                    
+    </script>
+</body>
+</html>
