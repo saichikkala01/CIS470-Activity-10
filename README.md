@@ -15,6 +15,11 @@ For the Yaml file, refer to the steps below.
 
 You can refer to the steps from Activity 9 to build and deploy an AWS Lambda function that can classify triangles.
 
+**Notes**<br> 
+- You will need to add the secret keys for your AWS account in the github. 
+- You will need to make the .github/workflows directory for your project.
+- You will need to make the .github/workflows directory for your project.
+
 ### Deliverable
 - Link to your GitHub repository
 - Link to your AWS Lambda function
@@ -22,6 +27,10 @@ You can refer to the steps from Activity 9 to build and deploy an AWS Lambda fun
 
 
 ## Workflows Test Deployment
+
+Below are the descriptions on the Jobs and the Steps in the YAML file for .github/workflows.
+
+Refer to Activity 9 for the steps. Make a workflow file, use the steps below in the workflow files. The YAML file should run the workflow, and deploy the code to Lambda.
 
 This line is just the name of the workflow.
 ```yaml
